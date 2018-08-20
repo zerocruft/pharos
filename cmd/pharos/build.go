@@ -2,28 +2,55 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"strconv"
 
-	"github.com/BurntSushi/toml"
-	"github.com/zerocruft/pharos"
 	"github.com/zerocruft/pharos/cmd/pharos/config"
+	git "gopkg.in/src-d/go-git.v4"
 )
 
-func build(cfg config.Config) {
-	preManifestBS, err := ioutil.ReadFile(cfg.Source + string(os.PathSeparator) + "manifest.toml")
-	if err != nil {
-		fmt.Println("manifest.toml is required in source directory")
-		return
-	}
-	manifestBS := preprocess(preManifestBS)
-	var manifest pharos.Manifest
-	_, err = toml.Decode(string(manifestBS), &manifest)
-	fmt.Println(manifest)
-
+func saveForLater(cfg config.Config) {
+	// preManifestBS, err := ioutil.ReadFile(cfg.Source + string(os.PathSeparator) + "manifest.toml")
+	// if err != nil {
+	// 	fmt.Println("manifest.toml is required in source directory")
+	// 	return
+	// }
+	// manifestBS := preprocess(preManifestBS)
+	// var manifest pharos.Manifest
+	// _, err = toml.Decode(string(manifestBS), &manifest)
+	// if err != nil {
+	// 	fmt.Println(err)
+	// 	//DO something here
+	// 	return
+	// }
+	// fmt.Println(manifest)
 }
 
+func build(cfg config.Config) {
+	// TODO make sure build directory is ready
+
+	err := os.Mkdir(cfg.BuildDir, 0755)
+	if err != nil {
+		fmt.Println(err)
+	}
+	if err := os.RemoveAll(cfg.BuildDir + string(os.PathSeparator) + "temp"); err != nil {
+		fmt.Println(err)
+	}
+	if err := os.Mkdir(cfg.BuildDir+string(os.PathSeparator)+"temp", 0755); err != nil {
+		fmt.Println(err)
+	}
+	for _, source := range cfg.Sources {
+		r, err := git.PlainClone(cfg.BuildDir+string(os.PathSeparator)+"temp"+string(os.PathSeparator)+source.Name, false, &git.CloneOptions{
+			URL:               source.GitURL,
+			RecurseSubmodules: git.DefaultSubmoduleRecursionDepth,
+		})
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		fmt.Println(r)
+	}
+}
 func preprocess(bs []byte) []byte {
 	var rb []byte
 	var sort int

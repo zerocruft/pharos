@@ -1,3 +1,11 @@
 
 port = "8081"
-source = "/home/jab/code/dev/pharos101"
+build-dir = "target"
+
+[[source]]
+name = "pharos101"
+url = "https://github.com/jabgibson/pharos101.git"
+
+[[source]]
+name = "octo"
+url = "https://github.com/jabgibson/octo-sniffle.git"
