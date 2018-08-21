@@ -6,40 +6,38 @@ import (
 	"os"
 
 	"github.com/zerocruft/pharos/cmd/pharos/config"
+	"go.uber.org/zap"
 )
 
 var (
-	flagStart bool
-	flagBuild bool
-	flagConf  string
+	flagStart      bool
+	flagBuild      bool
+	flagConfigFile string
 )
 
 func main() {
-	wd, err := os.Getwd()
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	fmt.Println(wd)
 	flag.BoolVar(&flagStart, "start", false, "")
 	flag.BoolVar(&flagBuild, "build", false, "")
-	flag.StringVar(&flagConf, "conf", "config.toml", "")
+	flag.StringVar(&flagConfigFile, "config", "config.toml", "")
 	flag.Parse()
 
-	cfg := config.New(flagConf)
+	logger, err := zap.NewProduction()
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	logger.Info("testing")
+	cfg := config.New(flagConfigFile, logger)
 	if cfg == nil {
-		fmt.Println("No Config. Exiting")
+		logger.Error("config failed to build. exiting")
 		os.Exit(1)
 	}
 
 	if flagBuild {
-		build(*cfg)
-		// build(cfg)
+		build(*cfg, logger)
 		return
 	}
 	if flagStart {
 		go start()
 	}
-
-	fmt.Println("hw")
 }

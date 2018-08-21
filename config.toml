@@ -1,11 +1,11 @@
 
 port = "8081"
-build-dir = "target"
 
 [[source]]
 name = "pharos101"
 url = "https://github.com/jabgibson/pharos101.git"
+head = "dev"
 
-[[source]]
-name = "octo"
-url = "https://github.com/jabgibson/octo-sniffle.git"
+# [[source]]
+# name = "octo"
+# url = "https://github.com/jabgibson/octo-sniffle.git"
